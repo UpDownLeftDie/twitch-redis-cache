@@ -77,7 +77,6 @@ async function getUrlFromTwitch(username) {
   }
 
   const res = await request(options);
-  console.log(res);
   const twitchUser = JSON.parse(res);
 
   if (twitchUser.data && twitchUser.data.length) {
