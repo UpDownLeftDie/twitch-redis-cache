@@ -31,7 +31,7 @@ async function getUrl(ctx) {
     console.error("Redis error: ", err)
   );
   if (url) {
-    ctx.body = url;
+    ctx.body = { userImage: url };
     return;
   }
   console.debug(`[${username}]: Url not cached`);
@@ -40,12 +40,12 @@ async function getUrl(ctx) {
   console.debug(`[${username}]: done getting url`);
   if (!url) {
     console.debug(`[${username}]: Failed to get image from Twitch`);
-    ctx.body = placeholderImage;
+    ctx.body = { userImage: placeholderImage };
     return;
   }
 
   redisSet(username, url, "EX", cacheLengthS);
-  ctx.body = url;
+  ctx.body = { userImage: url };
   return;
 }
 
