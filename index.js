@@ -33,6 +33,7 @@ async function getUrl(ctx) {
     console.error("Redis error: ", err)
   );
   if (url) {
+    if (url === "404") url = placeholderImage;
     ctx.body = { userImage: url };
     return;
   }
@@ -47,6 +48,9 @@ async function getUrl(ctx) {
   }
 
   redisSet(username, url, "EX", cacheLengthS);
+  if (url === "404") {
+    url = placeholderImage;
+  }
   ctx.body = { userImage: url };
   return;
 }
@@ -73,10 +77,14 @@ async function getUrlFromTwitch(username) {
   }
 
   const res = await request(options);
+  console.log(res);
   const twitchUser = JSON.parse(res);
 
   if (twitchUser.data && twitchUser.data.length) {
     return twitchUser.data[0].profile_image_url;
+  } else if (twitchUser.data && twitchUser.data.length === 0) {
+    return "404";
   }
+
   return null;
 }
