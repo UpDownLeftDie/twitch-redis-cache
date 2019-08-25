@@ -1,5 +1,6 @@
 const Koa = require("koa");
 const app = new Koa();
+const cors = require("@koa/cors");
 const request = require("request-promise-native");
 const redis = require("redis");
 const router = require("koa-router")();
@@ -22,6 +23,7 @@ const placeholderImage =
   "https://static-cdn.jtvnw.net/user-default-pictures/4cbf10f1-bb9f-4f57-90e1-15bf06cfe6f5-profile_image-300x300.jpg";
 
 router.get("/userimage/:username", getUrl);
+app.use(cors());
 app.use(router.routes());
 
 async function getUrl(ctx) {

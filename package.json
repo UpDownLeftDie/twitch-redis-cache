@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/UpDownLeftDie/Twitch-User-Image-Cache#readme",
   "dependencies": {
+    "@koa/cors": "^3.0.0",
     "dotenv": "^8.1.0",
     "koa": "^2.8.1",
     "koa-router": "^7.4.0",
