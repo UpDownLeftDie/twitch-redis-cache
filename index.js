@@ -21,7 +21,7 @@ const placeholderImage =
   process.env.PLACEHOLDER_IMAGE ||
   "https://static-cdn.jtvnw.net/user-default-pictures/4cbf10f1-bb9f-4f57-90e1-15bf06cfe6f5-profile_image-300x300.jpg";
 
-router.get("/:username", getUrl);
+router.get("/userimage/:username", getUrl);
 app.use(router.routes());
 
 async function getUrl(ctx) {
@@ -49,7 +49,11 @@ async function getUrl(ctx) {
   return;
 }
 
-app.listen(process.env.PORT || 3000);
+const server = app.listen(process.env.PORT || 3000, () => {
+  var host = server.address().address;
+  var port = server.address().port;
+  console.log("Example app listening at http://%s:%s", host, port);
+});
 
 async function getUrlFromTwitch(username) {
   const options = {
