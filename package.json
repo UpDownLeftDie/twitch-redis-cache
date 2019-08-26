@@ -1,5 +1,5 @@
 {
-  "name": "twitch-user-image-cache",
+  "name": "twitch-redis-cache",
   "version": "1.0.0",
   "description": "Redis cache and rest api for user image urls",
   "main": "index.js",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/UpDownLeftDie/Twitch-User-Image-Cache.git"
+    "url": "git+https://github.com/UpDownLeftDie/twitch-redis-cache.git"
   },
   "author": "Jared Kotoff (UpDownLeftDie)",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/UpDownLeftDie/Twitch-User-Image-Cache/issues"
+    "url": "https://github.com/UpDownLeftDie/twitch-redis-cache/issues"
   },
-  "homepage": "https://github.com/UpDownLeftDie/Twitch-User-Image-Cache#readme",
+  "homepage": "https://github.com/UpDownLeftDie/twitch-redis-cache#readme",
   "dependencies": {
     "@koa/cors": "^3.0.0",
     "dotenv": "^8.1.0",

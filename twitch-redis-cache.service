@@ -1,0 +1,13 @@
+[Unit]
+Description=Twitch API cache with redis
+After=network.target
+
+[Service]
+EnvironmentFile=/opt/twitch-redis-cache/.env
+Type=simple
+User=root
+ExecStart=/usr/bin/node /opt/twitch-redis-cache
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
