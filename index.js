@@ -4,9 +4,7 @@ const cors = require("@koa/cors");
 const request = require("request-promise-native");
 const redis = require("redis");
 const router = require("koa-router")();
-const {
-  promisify
-} = require("util");
+const { promisify } = require("util");
 
 const client = redis.createClient();
 const redisGet = promisify(client.get).bind(client);
@@ -32,7 +30,6 @@ const server = app.listen(process.env.PORT || 3000, () => {
   var port = server.address().port;
   console.log("twitch-redis-cache listening at http://%s:%s", host, port);
 });
-
 
 async function getUserImageUrl(ctx) {
   let cacheLengthS = process.env.CACHE_LENGTH_S || 604800; // 604800 == 7 days
@@ -89,7 +86,7 @@ async function getUserImageUrlFromTwitch(username) {
   }
 
   const res = await request(options);
-  if (res.statusCode === 429) return "429"
+  if (res.statusCode === 429) return "429";
   const twitchUser = JSON.parse(res);
 
   if (twitchUser.data && twitchUser.data.length) {
