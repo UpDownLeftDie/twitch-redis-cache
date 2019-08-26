@@ -38,4 +38,5 @@ A simpler method is using [Cloudflare](https://www.cloudflare.com/).
 2. Cypto > SSL > **Flexible**
    1. This is because the server we're running the API on does not have a cert.
    2. Alternativly, if you can use a `Page Rule` to change the SSL setting if youre using a subdomain for this API.
-3. Now you should be able to call it via `https://domain.com/userimage/Username`
+3. Set the port in the `.env` to `80`
+4. Now you should be able to call it via `https://domain.com/userimage/TwitchUserNameHere`
