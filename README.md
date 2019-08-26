@@ -25,8 +25,8 @@ Simple API to proxy and cache calls to Twitch's API to create a long term buffer
    1. `cd /opt/twitch-redis-cache && mv twitch-redis-cache.service /lib/systemd/system`
    2. Edit the service file as needed
 3. Enable and start the service
-   1. `sudo systemctrl enable twitch-redis-cache.service && sudo systemctrl start twitch-redis-cache.service`
-   2. Optional: make sure its running `sudo systemctrl status twitch-redis-cache.service`
+   1. `sudo systemctl enable twitch-redis-cache.service && sudo systemctl start twitch-redis-cache.service`
+   2. Optional: make sure its running `sudo systemctl status twitch-redis-cache.service`
 
 ### 3. Hosting Setup
 
