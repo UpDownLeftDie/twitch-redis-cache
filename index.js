@@ -4,7 +4,9 @@ const cors = require("@koa/cors");
 const request = require("request-promise-native");
 const redis = require("redis");
 const router = require("koa-router")();
-const { promisify } = require("util");
+const {
+  promisify
+} = require("util");
 
 const client = redis.createClient();
 const redisGet = promisify(client.get).bind(client);
@@ -17,51 +19,61 @@ if (!oauth && !clientId) {
   console.error("Add your OAuth (prefered) or Client-Id to a .env file.");
   return;
 }
-const cacheLengthS = process.env.CACHE_LENGTH_S || 604800; // 604800 = 7 days
 const placeholderImage =
   process.env.PLACEHOLDER_IMAGE ||
   "https://static-cdn.jtvnw.net/user-default-pictures/4cbf10f1-bb9f-4f57-90e1-15bf06cfe6f5-profile_image-300x300.jpg";
 
-router.get("/userimage/:username", getUrl);
+router.get("/userimage/:username", getUserImageUrl);
 app.use(cors());
 app.use(router.routes());
-
-async function getUrl(ctx) {
-  const username = ctx.params.username.toLowerCase().trim();
-  console.debug(`[${username}]: Getting image`);
-  let url = await redisGet(username).catch(err =>
-    console.error("Redis error: ", err)
-  );
-  if (url) {
-    if (url === "404") url = placeholderImage;
-    ctx.body = { userImage: url };
-    return;
-  }
-  console.debug(`[${username}]: Url not cached`);
-
-  url = await getUrlFromTwitch(username);
-  console.debug(`[${username}]: done getting url`);
-  if (!url) {
-    console.debug(`[${username}]: Failed to get image from Twitch`);
-    ctx.body = { userImage: placeholderImage };
-    return;
-  }
-
-  redisSet(username, url, "EX", cacheLengthS);
-  if (url === "404") {
-    url = placeholderImage;
-  }
-  ctx.body = { userImage: url };
-  return;
-}
 
 const server = app.listen(process.env.PORT || 3000, () => {
   var host = server.address().address;
   var port = server.address().port;
-  console.log("Twitch Cache listening at http://%s:%s", host, port);
+  console.log("twitch-redis-cache listening at http://%s:%s", host, port);
 });
 
-async function getUrlFromTwitch(username) {
+
+async function getUserImageUrl(ctx) {
+  let cacheLengthS = process.env.CACHE_LENGTH_S || 604800; // 604800 == 7 days
+  const username = ctx.params.username.toLowerCase().trim();
+  console.debug(`[${username}]: Getting image`);
+  let url = await redisGet(username).catch(err => {
+    console.error("Redis error: ", err);
+  });
+  if (url) {
+    if (url === "404" || url === "429") url = placeholderImage;
+    ctx.body = {
+      userImage: url
+    };
+    return;
+  }
+  console.debug(`[${username}]: Url not cached`);
+
+  url = await getUserImageUrlFromTwitch(username);
+  console.debug(`[${username}]: done getting url`);
+  if (!url) {
+    console.debug(`[${username}]: Failed to get image from Twitch`);
+    ctx.body = {
+      userImage: placeholderImage
+    };
+    return;
+  } else if (url === "429") {
+    console.debug(`[${username}]: API limit hit`);
+    cacheLengthS = 60;
+  }
+
+  redisSet(username, url, "EX", cacheLengthS);
+  if (url === "404" || url === "429") {
+    url = placeholderImage;
+  }
+  ctx.body = {
+    userImage: url
+  };
+  return;
+}
+
+async function getUserImageUrlFromTwitch(username) {
   const options = {
     method: "GET",
     url: `https://api.twitch.tv/helix/users?login=${username}`
@@ -77,6 +89,7 @@ async function getUrlFromTwitch(username) {
   }
 
   const res = await request(options);
+  if (res.statusCode === 429) return "429"
   const twitchUser = JSON.parse(res);
 
   if (twitchUser.data && twitchUser.data.length) {
