@@ -19,11 +19,11 @@
   "homepage": "https://github.com/UpDownLeftDie/twitch-redis-cache#readme",
   "dependencies": {
     "@koa/cors": "^3.0.0",
-    "dotenv": "^8.1.0",
-    "koa": "^2.8.1",
+    "dotenv": "^8.2.0",
+    "koa": "^2.11.0",
     "koa-router": "^7.4.0",
     "redis": "^2.8.0",
     "request": "^2.88.0",
-    "request-promise-native": "^1.0.7"
+    "request-promise-native": "^1.0.8"
   }
 }

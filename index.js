@@ -9,6 +9,7 @@ const { promisify } = require("util");
 const client = redis.createClient();
 const redisGet = promisify(client.get).bind(client);
 const redisSet = promisify(client.set).bind(client);
+const redisDel = promisify(client.del).bind(client);
 
 require("dotenv").config();
 const oauth = process.env.OAUTH;
@@ -22,6 +23,7 @@ const placeholderImage =
   "https://static-cdn.jtvnw.net/user-default-pictures/4cbf10f1-bb9f-4f57-90e1-15bf06cfe6f5-profile_image-300x300.jpg";
 
 router.get("/userimage/:username", getUserImageUrl);
+router.delete("/userimage/:username", deleteUserImageUrl);
 app.use(cors());
 app.use(router.routes());
 
@@ -96,4 +98,19 @@ async function getUserImageUrlFromTwitch(username) {
   }
 
   return null;
+}
+
+async function deleteUserImageUrl(ctx) {
+  const username = ctx.params.username.toLowerCase().trim();
+  console.debug(`Deleting cached url for ${username}`);
+  await redisDel(username)
+    .catch(err => {
+      console.error("Redis error: ", err);
+      ctx.status = 500;
+      return;
+    })
+    .then(() => {
+      ctx.status = 204;
+      return;
+    });
 }
