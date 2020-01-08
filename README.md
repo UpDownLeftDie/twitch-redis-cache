@@ -4,12 +4,11 @@ Simple API to proxy and cache calls to Twitch's API to create a long term buffer
 
 ## Method 1: Docker Setup
 
-1. `npm install`
-2. `cp example.env .env`
-3. Edit `.env` accordingly
+1. `cp example.env .env`
+2. Edit `.env` accordingly
    1. You only need OAuth OR Client-ID tokens. OAuth allow for high volume of requests per minute.
-4. `docker build -t twitch-redis-cache .`
-5. `docker run -d -p 3000:3000 twitch-redis-cache`
+3. `docker build -t twitch-redis-cache .`
+4. `docker run -d -p 3000:3000 twitch-redis-cache`
 
 ## Method 2: Local Setup
 
@@ -23,7 +22,8 @@ Simple API to proxy and cache calls to Twitch's API to create a long term buffer
 3. `npm install`
 4. `cp example.env .env`
 5. Edit `.env` accordingly
-   1. You only need OAuth OR Client-ID tokens. OAuth allow for high volume of requests per minute.
+   1. You only need OAuth OR Client-ID tokens
+   2. OAuth allow for high volume of requests per minute.
 6. `npm start`
 
 ### 2. Service
@@ -37,7 +37,7 @@ Simple API to proxy and cache calls to Twitch's API to create a long term buffer
    1. `sudo systemctl enable twitch-redis-cache.service && sudo systemctl start twitch-redis-cache.service`
    2. Optional: make sure its running `sudo systemctl status twitch-redis-cache.service`
 
-### 3. Hosting Setup
+## Hosting Setup
 
 Depending on where you're calling this API from you'll probably need it to be behind SSL.
 You could use [Let's encrypt](https://letsencrypt.org/) to get a certificate if you know how to set that up.
