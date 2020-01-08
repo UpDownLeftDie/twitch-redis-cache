@@ -2,7 +2,16 @@
 
 Simple API to proxy and cache calls to Twitch's API to create a long term buffer and allow high volume of requests.
 
-## Setup
+## Method 1: Docker Setup
+
+1. `npm install`
+2. `cp example.env .env`
+3. Edit `.env` accordingly
+   1. You only need OAuth OR Client-ID tokens. OAuth allow for high volume of requests per minute.
+4. `docker build -t twitch-redis-cache .`
+5. `docker run -d -p 3000:3000 twitch-redis-cache`
+
+## Method 2: Local Setup
 
 ### 1. Dependancies
 
@@ -10,9 +19,9 @@ Simple API to proxy and cache calls to Twitch's API to create a long term buffer
    1. Linux: `apt install redis-server`
    2. Mac (via [homebrew](https://brew.sh/)): `brew install redis`
    3. Windows: [https://redis.io/download](https://redis.io/download)
-2. `https://github.com/UpDownLeftDie/twitch-redis-cache.git && cd twitch-redis-cache`
+2. git clone `https://github.com/UpDownLeftDie/twitch-redis-cache.git && cd twitch-redis-cache`
 3. `npm install`
-4. `cp exampl.env .env`
+4. `cp example.env .env`
 5. Edit `.env` accordingly
    1. You only need OAuth OR Client-ID tokens. OAuth allow for high volume of requests per minute.
 6. `npm start`
