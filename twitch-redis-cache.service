@@ -6,7 +6,7 @@ After=network.target
 EnvironmentFile=/opt/twitch-redis-cache/.env
 Type=simple
 User=root
-ExecStart=/usr/bin/node /opt/twitch-redis-cache
+ExecStart=/usr/bin/node /opt/twitch-redis-cache/src
 Restart=on-failure
 
 [Install]
