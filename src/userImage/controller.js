@@ -1,10 +1,6 @@
-const router = require("koa-router")();
 const request = require("request-promise-native");
 const redis = require("../redis.js");
 const { oauth, clientId } = require("../config.js");
-
-router.get("/userimage/:username", getUserImageUrl);
-router.delete("/userimage/:username", deleteUserImageUrl);
 
 const placeholderImage =
   process.env.PLACEHOLDER_IMAGE ||
@@ -49,6 +45,22 @@ async function getUserImageUrl(ctx) {
   return;
 }
 
+async function deleteUserImageUrl(ctx) {
+  const username = ctx.params.username.toLowerCase().trim();
+  console.debug(`Deleting cached url for ${username}`);
+  await redis
+    .del(username)
+    .catch(err => {
+      console.error("Redis error: ", err);
+      ctx.status = 500;
+      return;
+    })
+    .then(() => {
+      ctx.status = 204;
+      return;
+    });
+}
+
 async function getUserImageUrlFromTwitch(username) {
   const options = {
     method: "GET",
@@ -77,20 +89,5 @@ async function getUserImageUrlFromTwitch(username) {
   return null;
 }
 
-async function deleteUserImageUrl(ctx) {
-  const username = ctx.params.username.toLowerCase().trim();
-  console.debug(`Deleting cached url for ${username}`);
-  await redis
-    .del(username)
-    .catch(err => {
-      console.error("Redis error: ", err);
-      ctx.status = 500;
-      return;
-    })
-    .then(() => {
-      ctx.status = 204;
-      return;
-    });
-}
-
-module.exports = router;
+exports.getUserImageUrl = getUserImageUrl;
+exports.deleteUserImageUrl = deleteUserImageUrl;

@@ -1,11 +1,11 @@
 const Koa = require("koa");
 const app = new Koa();
 const cors = require("@koa/cors");
-const router = require("./routes");
+const userImageRouter = require("./userImage/index");
 require("./config.js");
 
 app.use(cors());
-app.use(router());
+userImageRouter.init(app);
 
 const server = app.listen(process.env.PORT || 3000, () => {
   var host = server.address().address;
