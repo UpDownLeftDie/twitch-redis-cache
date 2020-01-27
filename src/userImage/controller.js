@@ -10,37 +10,38 @@ async function getUserImageUrl(ctx) {
   let cacheLengthS = process.env.CACHE_LENGTH_S || 604800; // 604800 == 7 days
   const username = ctx.params.username.toLowerCase().trim();
   console.debug(`[${username}]: Getting image`);
-  let url = await redis.get(username).catch(err => {
+  let userImage = await redis.get(username).catch(err => {
     console.error("Redis error: ", err);
   });
-  if (url) {
-    if (url === "404" || url === "429") url = placeholderImage;
+  if (userImage) {
+    if (userImage === "404" || userImage === "429")
+      userImage = placeholderImage;
     ctx.body = {
-      userImage: url
+      userImage
     };
     return;
   }
-  console.debug(`[${username}]: Url not cached`);
+  console.debug(`[${username}]: userImage not cached`);
 
-  url = await getUserImageUrlFromTwitch(username);
-  console.debug(`[${username}]: done getting url`);
-  if (!url) {
+  userImage = await getUserImageUrlFromTwitch(username);
+  console.debug(`[${username}]: done getting userImage`);
+  if (!userImage) {
     console.debug(`[${username}]: Failed to get image from Twitch`);
     ctx.body = {
       userImage: placeholderImage
     };
     return;
-  } else if (url === "429") {
+  } else if (userImage === "429") {
     console.debug(`[${username}]: API limit hit`);
     cacheLengthS = 60;
   }
 
-  redis.set(username, url, "EX", cacheLengthS);
-  if (url === "404" || url === "429") {
-    url = placeholderImage;
+  redis.set(username, userImage, "EX", cacheLengthS);
+  if (userImage === "404" || userImage === "429") {
+    userImage = placeholderImage;
   }
   ctx.body = {
-    userImage: url
+    userImage
   };
   return;
 }
