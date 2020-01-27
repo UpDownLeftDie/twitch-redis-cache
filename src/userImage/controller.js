@@ -1,6 +1,5 @@
-const request = require("request-promise-native");
 const redis = require("../redis.js");
-const { oauth, clientId } = require("../config.js");
+const { twitchReq } = require("../utils.js");
 
 const placeholderImage =
   process.env.PLACEHOLDER_IMAGE ||
@@ -63,21 +62,8 @@ async function deleteUserImageUrl(ctx) {
 }
 
 async function getUserImageUrlFromTwitch(username) {
-  const options = {
-    method: "GET",
-    url: `https://api.twitch.tv/helix/users?login=${username}`
-  };
-  if (oauth) {
-    options.headers = {
-      Authorization: `Bearer ${oauth}`
-    };
-  } else if (clientId) {
-    options.headers = {
-      "Client-ID": clientId
-    };
-  }
-
-  const res = await request(options);
+  const url = `https://api.twitch.tv/helix/users?login=${username}`;
+  const res = await twitchReq(url);
   if (res.statusCode === 429) return "429";
   const twitchUser = JSON.parse(res);
 
