@@ -1,6 +1,7 @@
 const redis = require("../redis.js");
 const { twitchReq } = require("../utils.js");
 
+const prefix = "userimage-";
 const placeholderImage =
   process.env.PLACEHOLDER_IMAGE ||
   "https://static-cdn.jtvnw.net/user-default-pictures/4cbf10f1-bb9f-4f57-90e1-15bf06cfe6f5-profile_image-300x300.jpg";
@@ -8,8 +9,9 @@ const placeholderImage =
 async function getUserImageUrl(ctx) {
   let cacheLengthS = process.env.CACHE_LENGTH_S || 604800; // 604800 == 7 days
   const username = ctx.params.username.toLowerCase().trim();
-  console.debug(`[${username}]: Getting image`);
-  let userImage = await redis.get(username).catch(err => {
+  const cacheKey = `${prefix}${username}`;
+  console.debug(`[${cacheKey}]: Getting image`);
+  let userImage = await redis.get(cacheKey).catch(err => {
     console.error("Redis error: ", err);
   });
   if (userImage) {
@@ -20,22 +22,22 @@ async function getUserImageUrl(ctx) {
     };
     return;
   }
-  console.debug(`[${username}]: userImage not cached`);
+  console.debug(`[${cacheKey}]: userImage not cached`);
 
   userImage = await getUserImageUrlFromTwitch(username);
-  console.debug(`[${username}]: done getting userImage`);
+  console.debug(`[${cacheKey}]: done getting userImage`);
   if (!userImage) {
-    console.debug(`[${username}]: Failed to get image from Twitch`);
+    console.debug(`[${cacheKey}]: Failed to get image from Twitch`);
     ctx.body = {
       userImage: placeholderImage
     };
     return;
   } else if (userImage === "429") {
-    console.debug(`[${username}]: API limit hit`);
+    console.debug(`[${cacheKey}]: API limit hit`);
     cacheLengthS = 60;
   }
 
-  redis.set(username, userImage, "EX", cacheLengthS);
+  redis.set(cacheKey, userImage, "EX", cacheLengthS);
   if (userImage === "404" || userImage === "429") {
     userImage = placeholderImage;
   }
@@ -47,9 +49,10 @@ async function getUserImageUrl(ctx) {
 
 async function deleteUserImageUrl(ctx) {
   const username = ctx.params.username.toLowerCase().trim();
+  const cacheKey = `${prefix}${username}`;
   console.debug(`Deleting cached url for ${username}`);
   await redis
-    .del(username)
+    .del(cacheKey)
     .catch(err => {
       console.error("Redis error: ", err);
       ctx.status = 500;
