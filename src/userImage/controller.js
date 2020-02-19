@@ -50,7 +50,7 @@ async function getUserImageUrl(ctx) {
 async function deleteUserImageUrl(ctx) {
   const username = ctx.params.username.toLowerCase().trim();
   const cacheKey = `${prefix}${username}`;
-  console.debug(`Deleting cached url for ${username}`);
+  console.debug(`[${cacheKey}]: Deleting cached data`);
   await redis
     .del(cacheKey)
     .catch(err => {

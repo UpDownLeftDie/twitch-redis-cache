@@ -1,47 +1,72 @@
 const redis = require("../redis.js");
-const { twitchReq } = require("../utils");
+const { twitchReq, getUsername } = require("../utils");
 
 const prefix = "streams-";
 
+async function getStreams(ctx) {
+  const username = ctx.params.username.toLowerCase().trim();
+  const streams = await cacheOrGetStreams(username);
+  ctx.body = {
+    streams
+  };
+}
+
 async function getLiveStatus(ctx) {
   const username = ctx.params.username.toLowerCase().trim();
-  const stream = await getStreams(username);
-  const isLive = !!(stream && stream.id);
+  const streams = await cacheOrGetStreams(username);
+  const isLive = !!(streams && streams.id);
   ctx.body = {
     isLive
   };
 }
 
-async function getStreams(username) {
+async function deleteStreams(ctx) {
+  const username = ctx.params.username.toLowerCase().trim();
+  const cacheKey = `${prefix}${username}`;
+  console.debug(`[${cacheKey}]: Deleting cached data`);
+  await redis
+    .del(cacheKey)
+    .catch(err => {
+      console.error("Redis error: ", err);
+      ctx.status = 500;
+      return;
+    })
+    .then(() => {
+      ctx.status = 204;
+      return;
+    });
+}
+
+async function cacheOrGetStreams(username) {
   let cacheLengthS = 60; // 60 == 1min
   const cacheKey = `${prefix}${username}`;
-  console.debug(`[${cacheKey}]: Getting stream status`);
+  console.debug(`[${cacheKey}]: Getting streams status`);
   const data = await redis.get(cacheKey).catch(err => {
     console.error("Redis error: ", err);
   });
-  let twitchStream = JSON.parse(data);
-  if (twitchStream) {
-    return twitchStream;
+  let twitchStreams = JSON.parse(data);
+  if (twitchStreams) {
+    return twitchStreams;
   }
 
   console.debug(`[${cacheKey}]: isLive not cached`);
-  twitchStream = await getStreamFromTwitch(username);
+  twitchStreams = await getStreamsFromTwitch(username);
   console.debug(`[${cacheKey}]: done getting stream`);
-  if (!twitchStream) {
-    console.debug(`[${cacheKey}]: Failed to get stream from Twitch`);
+  if (!twitchStreams) {
+    console.debug(`[${cacheKey}]: Failed to get streams from Twitch`);
     return;
-  } else if (twitchStream === "429") {
+  } else if (twitchStreams === "429") {
     console.debug(`[${cacheKey}]: API limit hit`);
   }
 
-  redis.set(cacheKey, JSON.stringify(twitchStream), "EX", cacheLengthS);
-  if (twitchStream === "429") {
+  redis.set(cacheKey, JSON.stringify(twitchStreams), "EX", cacheLengthS);
+  if (twitchStreams === "429") {
     return {};
   }
-  return twitchStream;
+  return twitchStreams;
 }
 
-async function getStreamFromTwitch(username) {
+async function getStreamsFromTwitch(username) {
   const url = `https://api.twitch.tv/helix/streams?user_login=${username}`;
   const res = await twitchReq(url);
   if (res.statusCode === 429) return "429";
@@ -53,4 +78,6 @@ async function getStreamFromTwitch(username) {
   return {};
 }
 
+exports.getStreams = getStreams;
 exports.getLiveStatus = getLiveStatus;
+exports.deleteStreams = deleteStreams;

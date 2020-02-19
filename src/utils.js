@@ -19,4 +19,9 @@ const twitchReq = async (url, method = "GET") => {
   return await request(options);
 };
 
+const getUsername = ctx => {
+  return ctx.params.username.toLowerCase().trim();
+};
+
 exports.twitchReq = twitchReq;
+exports.getUsername = getUsername;
