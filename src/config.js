@@ -16,7 +16,7 @@ async function loadSession() {
     console.error(err);
     throw new Error("Failed to getSessionStorage in config.js");
   }
-  return session;
+  return { ...config };
 }
 
 module.exports = loadSession();

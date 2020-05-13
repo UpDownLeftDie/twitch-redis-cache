@@ -3,15 +3,20 @@ const app = new Koa();
 const cors = require("@koa/cors");
 const userImageRouter = require("./streams/index");
 const streamsRouter = require("./userImage/index");
-require("./config.js");
 
-app.use(cors());
-app.proxy = true;
-userImageRouter.init(app);
-streamsRouter.init(app);
+async function main() {
+  const config = await require("./config.js");
 
-const server = app.listen(process.env.PORT || 3000, () => {
-  var host = server.address().address;
-  var port = server.address().port;
-  console.log("twitch-redis-cache listening at http://%s:%s", host, port);
-});
+  app.use(cors());
+  app.proxy = true;
+  userImageRouter.init(app);
+  streamsRouter.init(app);
+
+  const server = app.listen(config.port || 3000, () => {
+    var host = server.address().address;
+    var port = server.address().port;
+    console.log("twitch-redis-cache listening at http://%s:%s", host, port);
+  });
+}
+
+main();
