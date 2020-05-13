@@ -12,7 +12,7 @@ Simple API to proxy and cache calls to Twitch's API to create a long term buffer
 
 ## Method 2: Local Setup
 
-### 1. Dependancies
+### 1. Dependencies
 
 1. Install Redis-Server
    1. Linux: `apt install redis-server`
@@ -46,6 +46,6 @@ A simpler method is using [Cloudflare](https://www.cloudflare.com/).
 1. Add a domain you purchased to Cloudflare.
 2. Cypto > SSL > **Flexible**
    1. This is because the server we're running the API on does not have a cert.
-   2. Alternativly, if you can use a `Page Rule` to change the SSL setting if youre using a subdomain for this API.
+   2. Alternatively, if you can use a `Page Rule` to change the SSL setting if youre using a subdomain for this API.
 3. Set the port in the `.env` to `80` (Docker: use `-p 80:<port in .env>`)
 4. Now you should be able to call it via `https://domain.com/userimage/TwitchUserNameHere`

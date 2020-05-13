@@ -7,7 +7,7 @@ async function getStreams(ctx) {
   const username = ctx.params.username.toLowerCase().trim();
   const streams = await cacheOrGetStreams(username);
   ctx.body = {
-    streams
+    streams,
   };
 }
 
@@ -16,7 +16,7 @@ async function getLiveStatus(ctx) {
   const streams = await cacheOrGetStreams(username);
   const isLive = !!(streams && streams.id);
   ctx.body = {
-    isLive
+    isLive,
   };
 }
 
@@ -26,7 +26,7 @@ async function deleteStreams(ctx) {
   console.debug(`[${cacheKey}]: Deleting cached data`);
   await redis
     .del(cacheKey)
-    .catch(err => {
+    .catch((err) => {
       console.error("Redis error: ", err);
       ctx.status = 500;
       return;
@@ -41,7 +41,7 @@ async function cacheOrGetStreams(username) {
   let cacheLengthS = 60; // 60 == 1min
   const cacheKey = `${prefix}${username}`;
   console.debug(`[${cacheKey}]: Getting streams status`);
-  const data = await redis.get(cacheKey).catch(err => {
+  const data = await redis.get(cacheKey).catch((err) => {
     console.error("Redis error: ", err);
   });
   let twitchStreams = JSON.parse(data);
@@ -52,15 +52,15 @@ async function cacheOrGetStreams(username) {
   console.debug(`[${cacheKey}]: isLive not cached`);
   twitchStreams = await getStreamsFromTwitch(username);
   console.debug(`[${cacheKey}]: done getting stream`);
-  if (!twitchStreams) {
+  if (!twitchStreams || !Object.keys(twitchStreams).length) {
     console.debug(`[${cacheKey}]: Failed to get streams from Twitch`);
     return;
-  } else if (twitchStreams === "429") {
+  } else if (twitchStreams === 429) {
     console.debug(`[${cacheKey}]: API limit hit`);
   }
 
   redis.set(cacheKey, JSON.stringify(twitchStreams), "EX", cacheLengthS);
-  if (twitchStreams === "429") {
+  if (twitchStreams === 429) {
     return {};
   }
   return twitchStreams;
@@ -68,8 +68,11 @@ async function cacheOrGetStreams(username) {
 
 async function getStreamsFromTwitch(username) {
   const url = `https://api.twitch.tv/helix/streams?user_login=${username}`;
-  const res = await twitchReq(url);
-  if (res.statusCode === 429) return "429";
+  const res = await twitchReq(url).catch((err) => {
+    console.error(`Error getStreamsFromTwitch: ${err.toString()}`);
+    return {};
+  });
+  if (res.statusCode < 200 || res.statusCode > 299) return res.statusCode;
   const twitchStreams = JSON.parse(res);
 
   if (twitchStreams && twitchStreams.data) {

@@ -1,4 +1,11 @@
-const redis = require("redis");
+let redis;
+{
+  if (process.env.NODE_ENV === "development") {
+    redis = require("redis-mock");
+  } else {
+    redis = require("redis");
+  }
+}
 const { promisify } = require("util");
 
 const client = redis.createClient();

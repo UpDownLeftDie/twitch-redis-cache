@@ -6,6 +6,7 @@ const streamsRouter = require("./userImage/index");
 require("./config.js");
 
 app.use(cors());
+app.proxy = true;
 userImageRouter.init(app);
 streamsRouter.init(app);
 

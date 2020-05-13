@@ -1,0 +1,10 @@
+{
+  "twitch": {
+    "clientId": "",
+    "secret": ""
+  },
+  "debug": false,
+  "cacheLength": 604800,
+  "port": 9000,
+  "placeholderImage": "https://static-cdn.jtvnw.net/user-default-pictures/4cbf10f1-bb9f-4f57-90e1-15bf06cfe6f5-profile_image-300x300.jpg"
+}
