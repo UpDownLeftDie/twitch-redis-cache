@@ -4,21 +4,21 @@ const { twitchReq } = require("../utils.js");
 const prefix = "userimage-";
 const placeholderImage =
   process.env.PLACEHOLDER_IMAGE ||
-  "https://static-cdn.jtvnw.net/user-default-pictures/4cbf10f1-bb9f-4f57-90e1-15bf06cfe6f5-profile_image-300x300.jpg";
+  "https://static-cdn.jtvnw.net/user-default-pictures-uv/cdd517fe-def4-11e9-948e-784f43822e80-profile_image-300x300.png";
 
 async function getUserImageUrl(ctx) {
   let cacheLengthS = process.env.CACHE_LENGTH_S || 604800; // 604800 == 7 days
   const username = ctx.params.username.toLowerCase().trim();
   const cacheKey = `${prefix}${username}`;
   console.debug(`[${cacheKey}]: Getting image`);
-  let userImage = await redis.get(cacheKey).catch(err => {
+  let userImage = await redis.get(cacheKey).catch((err) => {
     console.error("Redis error: ", err);
   });
   if (userImage) {
     if (userImage === "404" || userImage === "429")
       userImage = placeholderImage;
     ctx.body = {
-      userImage
+      userImage,
     };
     return;
   }
@@ -29,20 +29,19 @@ async function getUserImageUrl(ctx) {
   if (!userImage) {
     console.debug(`[${cacheKey}]: Failed to get image from Twitch`);
     ctx.body = {
-      userImage: placeholderImage
+      userImage: placeholderImage,
     };
     return;
   } else if (userImage === "429") {
     console.debug(`[${cacheKey}]: API limit hit`);
     cacheLengthS = 60;
   }
-
-  redis.set(cacheKey, userImage, "EX", cacheLengthS);
   if (userImage === "404" || userImage === "429") {
     userImage = placeholderImage;
   }
+  redis.set(cacheKey, userImage, "EX", cacheLengthS);
   ctx.body = {
-    userImage
+    userImage,
   };
   return;
 }
@@ -53,7 +52,7 @@ async function deleteUserImageUrl(ctx) {
   console.debug(`[${cacheKey}]: Deleting cached data`);
   await redis
     .del(cacheKey)
-    .catch(err => {
+    .catch((err) => {
       console.error("Redis error: ", err);
       ctx.status = 500;
       return;
@@ -69,6 +68,8 @@ async function getUserImageUrlFromTwitch(username) {
   const res = await twitchReq(url);
   if (res.statusCode === 429) return "429";
   const twitchUser = JSON.parse(res);
+
+  console.log(twitchUser);
 
   if (twitchUser.data && twitchUser.data.length) {
     return twitchUser.data[0].profile_image_url;

@@ -52,7 +52,7 @@ async function cacheOrGetStreams(username) {
   console.debug(`[${cacheKey}]: isLive not cached`);
   twitchStreams = await getStreamsFromTwitch(username);
   console.debug(`[${cacheKey}]: done getting stream`);
-  if (!twitchStreams || !Object.keys(twitchStreams).length) {
+  if (!twitchStreams) {
     console.debug(`[${cacheKey}]: Failed to get streams from Twitch`);
     return;
   } else if (twitchStreams === 429) {
