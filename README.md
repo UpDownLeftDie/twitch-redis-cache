@@ -49,3 +49,9 @@ A simpler method is using [Cloudflare](https://www.cloudflare.com/).
    2. Alternatively, if you can use a `Page Rule` to change the SSL setting if youre using a subdomain for this API.
 3. Set the port in the `.env` to `80` (Docker: use `-p 80:<port in .env>`)
 4. Now you should be able to call it via `https://domain.com/userimage/TwitchUserNameHere`
+
+## TODO
+
+* Replace `request` package with `node-fetch` (or equivalent package)
+* Add in request queuing to Twitch if rate-limit is hit
+* Switch to TypeScript (or even Golang)
