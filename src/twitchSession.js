@@ -61,15 +61,14 @@ async function twitchAuthToken(twitchSession, twitchConfig, code) {
   const options = {
     method: "POST",
     json: true,
-    qs: {},
   };
-  const qs = {
+  let qs = {
     client_id: twitchConfig.clientId,
     client_secret: twitchConfig.secret,
   };
   if (code) {
     console.log("Getting a new Twitch token");
-    options.qs = {
+    qs = {
       ...qs,
       code,
       grant_type: "authorization_code",
@@ -77,7 +76,7 @@ async function twitchAuthToken(twitchSession, twitchConfig, code) {
     };
   } else if (twitchSession.refreshToken) {
     console.log("Refreshing Twitch token");
-    options.qs = {
+    qs = {
       ...qs,
       grant_type: "refresh_token",
       refresh_token: twitchSession.refreshToken,
@@ -85,7 +84,13 @@ async function twitchAuthToken(twitchSession, twitchConfig, code) {
   } else {
     throw new Error("Either auth code or refresh token are needed");
   }
-  return await fetch("https://id.twitch.tv/oauth2/token", options);
+
+  const params = new URLSearchParams(qs);
+  const res = await fetch(
+    `https://id.twitch.tv/oauth2/token?${params}`,
+    options,
+  );
+  return res.json();
 }
 
 async function updateSessionStorage(partialSession) {

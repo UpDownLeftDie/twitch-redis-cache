@@ -73,7 +73,7 @@ async function getStreamsFromTwitch(username) {
     return {};
   });
   if (res.statusCode < 200 || res.statusCode > 299) return res.statusCode;
-  const twitchStreams = JSON.parse(res);
+  const twitchStreams = await res.json();
 
   if (twitchStreams && twitchStreams.data) {
     return twitchStreams.data[0] || {};

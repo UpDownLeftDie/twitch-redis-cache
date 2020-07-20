@@ -67,7 +67,7 @@ async function getUserImageUrlFromTwitch(username) {
   const url = `https://api.twitch.tv/helix/users?login=${username}`;
   const res = await twitchReq(url);
   if (res.statusCode === 429) return "429";
-  const twitchUser = JSON.parse(res);
+  const twitchUser = await res.json();
 
   console.log(twitchUser);
 
