@@ -1,5 +1,5 @@
 const fs = require("fs");
-const request = require("request-promise-native");
+const fetch = require("node-fetch");
 const moment = require("moment");
 const util = require("util");
 const config = require("../config.json");
@@ -60,7 +60,6 @@ async function twitchAuthCode(twitch) {
 async function twitchAuthToken(twitchSession, twitchConfig, code) {
   const options = {
     method: "POST",
-    uri: "https://id.twitch.tv/oauth2/token",
     json: true,
     qs: {},
   };
@@ -86,7 +85,7 @@ async function twitchAuthToken(twitchSession, twitchConfig, code) {
   } else {
     throw new Error("Either auth code or refresh token are needed");
   }
-  return await request(options);
+  return await fetch("https://id.twitch.tv/oauth2/token", options);
 }
 
 async function updateSessionStorage(partialSession) {

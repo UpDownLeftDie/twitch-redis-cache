@@ -1,19 +1,17 @@
-const request = require("request-promise-native");
+const fetch = require("node-fetch");
 const { getSessionStorage } = require("./twitchSession");
 
 const twitchReq = async (url, method = "GET") => {
   const { twitch } = await getSessionStorage();
   const options = {
     method,
-    url,
+    headers: {
+      Authorization: `Bearer ${twitch.accessToken}`,
+      "Client-ID": twitch.clientId,
+    },
   };
 
-  options.headers = {
-    Authorization: `Bearer ${twitch.accessToken}`,
-    "Client-ID": twitch.clientId,
-  };
-
-  return await request(options).catch((err) => {
+  return await fetch(url, options).catch((err) => {
     console.error(err);
     throw new Error("Failed to make request to twitch");
   });
