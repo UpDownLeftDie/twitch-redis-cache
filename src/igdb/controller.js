@@ -15,14 +15,14 @@ async function getGames(ctx) {
   if (games) {
     if (games === '404' || games === '429') games = [];
     ctx.body = {
-      games,
+      games: JSON.parse(games),
     };
     return;
   }
   console.debug(`[${cacheKey}]: games not cached`);
 
   games = await getGamesFromIDGB(body);
-  console.debug(`[${cacheKey}]: done getting userImage`);
+  console.debug(`[${cacheKey}]: done getting GamesFromIDGB`);
   if (!games) {
     console.debug(`[${cacheKey}]: Failed to get games from IDGB`);
     ctx.body = {
@@ -36,9 +36,9 @@ async function getGames(ctx) {
   if (games === '404' || games === '429') {
     games = [];
   }
-  redis.set(cacheKey, games, 'EX', cacheLengthS);
+  redis.set(cacheKey, JSON.stringify(games), 'EX', cacheLengthS);
   ctx.body = {
-    userImage,
+    games,
   };
   return;
 }
@@ -49,11 +49,9 @@ async function getGamesFromIDGB(body) {
   if (res.statusCode === 429) return '429';
   const games = await res.json();
 
-  console.log(games);
-
-  if (games.data && games.data.length) {
-    return games.data[0].profile_image_url;
-  } else if (games.data && games.data.length === 0) {
+  if (games && games.length) {
+    return games;
+  } else if (games && games.length === 0) {
     return '404';
   }
 

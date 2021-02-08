@@ -26,15 +26,16 @@ const idgbReq = async (url, body) => {
   const options = {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${twitch.accessToken}`,
+      Accept: 'application/json',
+      Authorization: `Bearer ${twitch.clientCredentials}`,
       'Client-ID': twitch.clientId,
     },
-    body: JSON.stringify(body),
+    body,
   };
 
   return await fetch(url, options).catch((err) => {
     console.error(err);
-    throw new Error('Failed to make request to twitch');
+    throw new Error('Failed to make request to IDGB');
   });
 };
 

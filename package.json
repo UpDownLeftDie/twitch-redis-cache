@@ -17,6 +17,11 @@
     "url": "https://github.com/UpDownLeftDie/twitch-redis-cache/issues"
   },
   "homepage": "https://github.com/UpDownLeftDie/twitch-redis-cache#readme",
+  "nodemonConfig": {
+    "ignore": [
+      "session.json"
+    ]
+  },
   "dependencies": {
     "@koa/cors": "^3.1.0",
     "co-body": "^6.1.0",
@@ -32,7 +37,7 @@
     "cross-env": "^7.0.3",
     "koa-bodyparser": "^4.3.0",
     "nodemon": "^2.0.7",
-    "open": "^7.3.1",
+    "open": "^7.4.0",
     "redis-mock": "^0.56.3"
   }
 }
